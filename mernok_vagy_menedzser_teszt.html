@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mérnök vagy Menedzser? – Teszt</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --text: #18202a;
+    --muted: #667085;
+    --accent: #2457d6;
+    --accent2: #173b91;
+    --border: #dfe3e8;
+    --success: #087443;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #eef3ff 0%, var(--bg) 55%, #eef7f2 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 32px 18px 50px; }
+  .hero {
+    text-align: center; padding: 26px 18px 20px;
+  }
+  .badge {
+    display: inline-block; padding: 7px 12px; border-radius: 999px;
+    background: #e5edff; color: var(--accent2); font-weight: 700; font-size: 13px;
+    margin-bottom: 12px;
+  }
+  h1 { margin: 0; font-size: clamp(30px, 5vw, 48px); line-height: 1.05; }
+  .subtitle { color: var(--muted); font-size: 17px; margin: 13px auto 0; max-width: 650px; }
+  .progress-wrap { margin: 18px 0 22px; }
+  .progress-top { display:flex; justify-content:space-between; color:var(--muted); font-size:14px; margin-bottom:8px; }
+  .progress { height: 9px; background:#e2e6ec; border-radius:99px; overflow:hidden; }
+  .progress-bar { height:100%; width:0%; background:var(--accent); transition:width .25s ease; }
+  .card {
+    background: var(--card); border:1px solid var(--border); border-radius:20px;
+    box-shadow: 0 12px 35px rgba(20,35,60,.08); padding: 28px;
+  }
+  .question-number { color:var(--accent); font-weight:800; font-size:14px; text-transform:uppercase; letter-spacing:.05em; }
+  h2 { font-size:25px; line-height:1.25; margin:8px 0 22px; }
+  .option {
+    display:block; position:relative; margin:12px 0; cursor:pointer;
+  }
+  .option input { position:absolute; opacity:0; }
+  .option-box {
+    display:flex; gap:14px; align-items:flex-start; padding:17px 18px;
+    border:2px solid var(--border); border-radius:15px; transition:.18s ease;
+    background:#fff;
+  }
+  .option:hover .option-box { border-color:#a9bce9; background:#f8faff; }
+  .option input:checked + .option-box {
+    border-color:var(--accent); background:#f1f5ff; box-shadow:0 4px 14px rgba(36,87,214,.10);
+  }
+  .letter {
+    flex:0 0 34px; width:34px; height:34px; border-radius:50%;
+    display:grid; place-items:center; background:#eef1f5; font-weight:900;
+  }
+  .option input:checked + .option-box .letter { background:var(--accent); color:#fff; }
+  .option-text { line-height:1.45; font-size:16px; }
+  .actions { display:flex; justify-content:space-between; gap:12px; margin-top:24px; }
+  button {
+    border:0; border-radius:12px; padding:13px 20px; font-size:16px; font-weight:800;
+    cursor:pointer; transition:.15s ease;
+  }
+  .primary { background:var(--accent); color:white; margin-left:auto; }
+  .primary:hover { background:var(--accent2); transform:translateY(-1px); }
+  .secondary { background:#edf0f4; color:#344054; }
+  .secondary:hover { background:#e2e6eb; }
+  button:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .error { color:#b42318; font-weight:700; margin-top:14px; display:none; }
+  #result { display:none; }
+  .result-card { text-align:center; }
+  .result-icon { font-size:64px; margin:8px 0; }
+  .result-title { font-size:32px; margin:5px 0 8px; }
+  .result-subtitle { color:var(--muted); font-size:17px; margin-bottom:22px; }
+  .scores { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0; }
+  .score { padding:17px; border:1px solid var(--border); border-radius:15px; background:#fafbfc; }
+  .score strong { display:block; font-size:30px; }
+  .result-text { text-align:left; line-height:1.65; padding:20px; border-radius:15px; background:#f7f8fa; }
+  .restart { margin-top:22px; background:var(--accent); color:#fff; }
+  .footer { text-align:center; color:#98a2b3; font-size:13px; margin-top:18px; }
+  @media (max-width:600px) {
+    .wrap { padding:18px 12px 35px; }
+    .card { padding:20px 16px; border-radius:16px; }
+    h2 { font-size:21px; }
+    .actions { flex-direction:column-reverse; }
+    .actions button { width:100%; }
+    .primary { margin-left:0; }
+    .scores { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="badge">DUÁLIS HALLGATÓI TESZT</div>
+    <h1>„Mérnök vagy Menedzser?”</h1>
+    <p class="subtitle">6 kérdés, kétféle gondolkodásmód. Válaszd azt, amelyik ösztönösen közelebb áll hozzád!</p>
+  </header>
+
+  <main>
+    <div id="quiz">
+      <div class="progress-wrap">
+        <div class="progress-top"><span id="progressText">1 / 6</span><span id="answeredText">0 válasz</span></div>
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+      <section class="card">
+        <div class="question-number" id="questionNumber"></div>
+        <h2 id="questionText"></h2>
+        <div id="options"></div>
+        <div class="error" id="error">Kérlek, válassz egy választ a folytatáshoz!</div>
+        <div class="actions">
+          <button class="secondary" id="backBtn" onclick="previousQuestion()">← Vissza</button>
+          <button class="primary" id="nextBtn" onclick="nextQuestion()">Következő →</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card result-card" id="result">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="question-number">A TE EREDMÉNYED</div>
+      <h2 class="result-title" id="resultTitle"></h2>
+      <p class="result-subtitle" id="resultSubtitle"></p>
+
+      <div class="scores">
+        <div class="score"><strong id="scoreA">0</strong><span>A válasz</span></div>
+        <div class="score"><strong id="scoreB">0</strong><span>B válasz</span></div>
+      </div>
+
+      <div class="result-text" id="resultText"></div>
+      <button class="restart" onclick="restartQuiz()">↻ Újra kitöltöm</button>
+    </section>
+  </main>
+
+  <div class="footer">A teszt játékos önismereti gyakorlat, nem tudományos személyiségteszt.</div>
+</div>
+
+<script>
+const questions = [
+  {
+    text: "Elromlik a kávéfőző az irodában. Mit teszel?",
+    A: "Előveszem a csavarhúzót, megkeresem a használati utasítást a neten, és addig nem tágítok, amíg szét nem szedtem.",
+    B: "Írok egy sürgős e-mailt az üzemeltetésnek, kiteszek egy „Out of Order” táblát, és megszervezem, hogy addig is honnan hozzunk kávét a csapatnak."
+  },
+  {
+    text: "Kapsz egy új, bonyolult okoseszközt. Hogyan indítod be?",
+    A: "Elolvasom a kézikönyvet.",
+    B: "Bekapcsolom, nyomkodom, ami logikusnak tűnik, ha meg elakadok, megkérek valakit, hogy állítsa be nekem."
+  },
+  {
+    text: "Egy kollégád odajön hozzád, mert elakadt a munkájával. Mit teszel?",
+    A: "Kiveszem a kezéből a billentyűzetet/egeret, és azt mondom: „Engedd csak, megmutatom, hogyan kell megcsinálni.”",
+    B: "Meghallgatom a problémáját, bátorítóan bólogatok, majd szervezek egy meetinget, hogy átbeszéljük a folyamatbeli elakadásokat."
+  },
+  {
+    text: "Terveztek egy új hidat a folyó felett. Mi az első gondolatod?",
+    A: "Kiszámolom a maximális szélterhelést, a rezonanciát, és optimalizálom a tartószerkezet acél-beton arányát.",
+    B: "Megnézem a költségvetést, egyeztetek az önkormányzattal a környezetvédelmi engedélyekről, és tartok egy sajtótájékoztatót az alapkőletételről."
+  },
+  {
+    text: "Egy futurisztikus, önvezető mágnesvasút (Hyperloop) állomását kell megtervezni. Melyik rész izgat a legjobban?",
+    A: "A hajtáslánc hatásfoka, a pálya görbületi sugara a kritikus pontokon vagy az állomás szerkezeti stabilitása földrengés esetén.",
+    B: "Hány utast tud kiszolgálni óránként, mennyibe kerül a jegy, és hogyan fog megtérülni a beruházás 10 éven belül."
+  },
+  {
+    text: "Mi a véleményed a szabványokról és az előírásokról?",
+    A: "A Szentírás. Ha a szabvány azt mondja, hogy 2,5-szeres biztonsági tényező kell, akkor én 3-szorosra tervezem, biztos ami biztos.",
+    B: "Fontos iránymutatások, de ha nagyon szorít a határidő és a büdzsé, keressük meg a jogi kiskapukat vagy a rugalmasabb értelmezési lehetőségeket."
+  }
+];
+
+const answers = Array(questions.length).fill(null);
+let current = 0;
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById("questionNumber").textContent = `KÉRDÉS ${current + 1}`;
+  document.getElementById("questionText").textContent = q.text;
+  document.getElementById("progressText").textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById("progressBar").style.width = `${((current + 1) / questions.length) * 100}%`;
+  const count = answers.filter(Boolean).length;
+  document.getElementById("answeredText").textContent = `${count} válasz`;
+  document.getElementById("backBtn").disabled = current === 0;
+  document.getElementById("nextBtn").textContent = current === questions.length - 1 ? "Eredmény →" : "Következő →";
+
+  const options = document.getElementById("options");
+  options.innerHTML = "";
+  [["A", q.A], ["B", q.B]].forEach(([letter, text]) => {
+    const label = document.createElement("label");
+    label.className = "option";
+    label.innerHTML = `
+      <input type="radio" name="answer" value="${letter}" ${answers[current] === letter ? "checked" : ""}>
+      <div class="option-box">
+        <div class="letter">${letter}</div>
+        <div class="option-text">${escapeHtml(text)}</div>
+      </div>`;
+    options.appendChild(label);
+  });
+  document.getElementById("error").style.display = "none";
+  document.querySelectorAll('input[name="answer"]').forEach(input => {
+    input.addEventListener("change", () => {
+      answers[current] = input.value;
+      document.getElementById("answeredText").textContent = `${answers.filter(Boolean).length} válasz`;
+      document.getElementById("error").style.display = "none";
+    });
+  });
+}
+
+function nextQuestion() {
+  if (!answers[current]) {
+    document.getElementById("error").style.display = "block";
+    return;
+  }
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+    window.scrollTo({top: 0, behavior: "smooth"});
+  } else {
+    showResult();
+  }
+}
+
+function previousQuestion() {
+  if (current > 0) {
+    current--;
+    renderQuestion();
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+}
+
+function showResult() {
+  const a = answers.filter(x => x === "A").length;
+  const b = answers.filter(x => x === "B").length;
+  let icon, title, subtitle, text;
+
+  if (a > b) {
+    icon = "🛠️";
+    title = "A Vérbeli Mérnök";
+    subtitle = `${a} A és ${b} B válasz`;
+    text = "Te vagy az, aki nem hisz a csodákban, csak a fizikában és a logikában. A meetingek számodra felesleges időpocsékolásnak tűnnek, amit tervezéssel is tölthetnél.";
+  } else if (b > a) {
+    icon = "💼";
+    title = "A Született Menedzser";
+    subtitle = `${a} A és ${b} B válasz`;
+    text = "Te már most látod a teljes képet. Tudod, hogy egy projektet a jó kommunikáció és a büdzsé tart életben. Nem feltétlenül tudod, mi van a motorháztető alatt, de el tudod adni a kocsit.";
+  } else {
+    icon = "🧬";
+    title = "A Duális Hibrid / Projektvezető";
+    subtitle = `${a} A és ${b} B válasz`;
+    text = "A duális képzés mintapéldánya! Megérted a mérnökök siralmait, de nem kapsz agyvérzést attól sem, ha meg kell nyitni a CAD-et. Te vagy a híd a két világ között – vagyis te vagy az, akit mind a két oldal egyszerre fog hibáztatni, ha csúszik a projekt!";
+  }
+
+  document.getElementById("quiz").style.display = "none";
+  document.getElementById("result").style.display = "block";
+  document.getElementById("resultIcon").textContent = icon;
+  document.getElementById("resultTitle").textContent = title;
+  document.getElementById("resultSubtitle").textContent = subtitle;
+  document.getElementById("scoreA").textContent = a;
+  document.getElementById("scoreB").textContent = b;
+  document.getElementById("resultText").textContent = text;
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function restartQuiz() {
+  answers.fill(null);
+  current = 0;
+  document.getElementById("result").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+  renderQuestion();
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
